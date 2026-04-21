@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+<div class="admin-container">
+
+    <h1>Admin Panel</h1>
+
+    <!-- TABS -->
+    <div class="admin-tabs">
+        <button class="tab-btn active" onclick="showSection('products', event)">Products</button>
+        <button class="tab-btn" onclick="showSection('repairs', event)">Repairs</button>
+    </div>
+
+    <!-- ================= PRODUCTS ================= -->
+    <div id="productsSection">
+
+        <form id="productForm">
+            <select id="category">
+                <option value="mobiles">Mobiles</option>
+                <option value="electronics">Electronics</option>
+            </select>
+
+            <input type="text" id="name" placeholder="Product Name" required>
+            <input type="text" id="price" placeholder="Price" required>
+            <input type="text" id="image" placeholder="/images/phone.jpg" required>
+            <input type="text" id="feature1" placeholder="Feature 1">
+            <input type="text" id="feature2" placeholder="Feature 2">
+
+            <button type="submit">Add Product</button>
+        </form>
+
+        <h2>Products</h2>
+        <div id="adminProductContainer"></div>
+
+    </div>
+
+    <!-- ================= REPAIRS ================= -->
+    <div id="repairsSection" style="display:none;">
+
+    <h2>Add Repair</h2>
+
+    <form id="repairForm">
+        <input type="text" id="repairId" placeholder="Repair ID (R001)" required>
+        <input type="text" id="customerName" placeholder="Customer Name" required>
+        <input type="text" id="device" placeholder="Device" required>
+
+        <select id="status">
+            <option value="Pending">Pending</option>
+            <option value="Ready">Ready</option>
+        </select>
+
+        <button type="submit">Add Repair</button>
+    </form>
+
+    <h2>All Repairs</h2>
+    <div id="repairList"></div>
+
+</div>
+
+</div>
+
+<script src="/js/admin.js"></script>
+
+</body>
+</html>

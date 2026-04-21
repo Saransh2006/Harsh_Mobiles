@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Aayush Singh",
+    "price": "1,19,000",
+    "image": "/images/samsung.jpg",
+    "features": [
+      "50MP Camera",
+      "1TB Storage"
+    ]
+  },
+  {
+    "name": "Motion Sensor Alert",
+    "price": "1,19,000",
+    "image": "/images/vivo.png",
+    "features": [
+      "50MP Camera",
+      "1TB Storage"
+    ]
+  },
+  {
+    "name": "gas_alert",
+    "price": "25999",
+    "image": "/images/iphone.jpg",
+    "features": [
+      "50MP Camera",
+      "1TB Storage"
+    ]
+  },
+  {
+    "name": "Saransh",
+    "price": "1,19,000",
+    "image": "/images/vivo.png",
+    "features": [
+      "vgjbh",
+      "1TB Storage"
+    ]
+  },
+  {
+    "name": "Motion Sensor Alert",
+    "price": "29635",
+    "image": "/images/samsung.jpg",
+    "features": [
+      "Bhot Bhadiya",
+      "Kasam se LE LE"
+    ]
+  },
+  {
+    "name": "Aawesh",
+    "price": "299",
+    "image": "/images/iphone.jpg",
+    "features": [
+      "50MP Camera",
+      "1TB Storage"
+    ]
+  },
+  {
+    "name": "Saransh Mangal",
+    "price": "/8946513",
+    "image": "/images/vivo.png",
+    "features": [
+      "ghbjk",
+      "hv b"
+    ]
+  }
+]

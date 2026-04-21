@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harsh Mobiles</title>
+<link rel="stylesheet" href="/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+ 
+<!-- NAVBAR -->
+<header class="navbar">
+    <h2>HarshMobiles.Shop</h2>
+    <div class="nav-right">
+        <span>📞 7877298215</span>
+        <a href="https://wa.me/917877298215" class="whatsapp-btn">WhatsApp</a>
+    </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+    <h1>Best Mobile Deals in Your Area</h1>
+    <p>Buy Phones • Electronics • Fast Repair Service</p>
+
+    <div class="toggle">
+        <div class="toggle-bg" id="toggleBg"></div>
+        <button id="mobilesBtn" class="active">Mobiles</button>
+        <button id="electronicsBtn">Electronics</button>
+    </div>
+</section>
+
+<!-- TRUST STRIP -->
+<section class="trust">
+    <div>✔ Within 24 Hour Repair</div>
+    <div>✔ Genuine Electronics</div>
+    <div>✔ Best Price Guarantee</div>
+</section>
+
+<!-- REPAIR TRACK -->
+<section class="repair-section">
+    <h2>Track Your Repair</h2>
+    <div class="repair-box">
+        <input type="text" id="repairId" placeholder="Enter Repair ID (e.g. R001)">
+        <button onclick="trackRepair()">Track</button>
+    </div>
+    <div id="repairResult"></div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products" id="productContainer"></section>
+
+<!-- STORE INFO -->
+<section class="store">
+
+    <div class="store-left">
+        <h2>Visit Our Store</h2>
+        <p>Expert advice & best deals available offline</p>
+
+        <p><strong>Address:</strong><br>
+       Purani Anaj Mandi, Bharatpur - Dholpur Rd, <br>
+       Near Parashar Hero Motors, near Baroda Rajasthan Kshetriya Grahmin Bank<br>
+        Rupbas, Bharatpur, Rajasthan 321404
+        </p>
+
+        <p><strong>Timing:</strong><br>
+        10 AM – 8 PM
+        </p>
+
+        <!-- OPEN MAP LINK -->
+        <a href="https://share.google/zb2ZAbvPUDfTHyqTe" 
+           target="_blank" 
+           class="direction">
+           📍 Open in Google Maps
+        </a>
+
+        <br><br>
+
+        <!-- GET DIRECTIONS -->
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Thathgarh Punjab"
+           target="_blank"
+           class="direction">
+           🚗 Get Directions
+        </a>
+    </div>
+
+    <!-- EMBEDDED MAP -->
+    <div class="store-map">
+      
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4490.319262873128!2d77.5949927!3d26.9915311!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3973eb4823372527%3A0xf0e59ec7e4c82f06!2sHarsh%20Mobile!5e1!3m2!1sen!2sin!4v1776460579204!5m2!1sen!2sin"
+         width="100%" 
+         height="100%" 
+         style="border:0;" 
+         allowfullscreen=""
+         loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+
+</section>
+
+<!-- CTA -->
+<section class="cta">
+    <h2>Need a Phone or Repair?</h2>
+    <p>Call or WhatsApp for instant response</p>
+
+    <div class="cta-buttons">
+        <button class="call-btn">Call Now</button>
+        <button class="whatsapp-btn">WhatsApp</button>
+    </div>
+</section>
+
+<script src="/js/main.js"></script>
+
+</body>
+</html>
