@@ -1,26 +1,40 @@
 // =======================
-// SWITCH SECTIONS (Tabs)
+// AUTH CHECK
+// =======================
+
+const token = sessionStorage.getItem("auth");
+
+if(!token){
+    window.location.href = "/admin-login";
+}
+
+// =======================
+// LOGOUT
+// =======================
+
+function logout(){
+    sessionStorage.removeItem("auth");
+    window.location.href = "/admin-login";
+}
+
+// =======================
+// TAB SWITCH
 // =======================
 
 function showSection(section, event){
 
-    // Hide all sections
     document.getElementById("productsSection").style.display = "none";
     document.getElementById("repairsSection").style.display = "none";
 
-    // Show selected section
     document.getElementById(section + "Section").style.display = "block";
 
-    // Active tab highlight
     document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
     event.target.classList.add("active");
 
-    // 🔥 IMPORTANT: reload repairs when opening repairs tab
     if(section === "repairs"){
         loadRepairs();
     }
 }
-
 
 // =======================
 // ADD PRODUCT
@@ -30,19 +44,34 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
-    const category = document.getElementById("category").value;
+    const fileInput = document.getElementById("imageFile");
+    let imageUrl = "";
+
+    if(fileInput && fileInput.files[0]){
+        const formData = new FormData();
+        formData.append("image", fileInput.files[0]);
+
+        const uploadRes = await fetch("/api/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const uploadData = await uploadRes.json();
+        imageUrl = uploadData.imageUrl;
+    }
 
     const product = {
         name: document.getElementById("name").value,
         price: document.getElementById("price").value,
-        image: document.getElementById("image").value,
+        image: imageUrl,
         features: [
             document.getElementById("feature1").value,
             document.getElementById("feature2").value
-        ]
+        ],
+        category: document.getElementById("category").value.toLowerCase()
     };
 
-    await fetch(`/api/${category}`, {
+    await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(product)
@@ -50,12 +79,9 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
 
     alert("Product Added ✅");
 
-    // reset form
-    document.getElementById("productForm").reset();
-
+    e.target.reset();
     loadProducts();
 });
-
 
 // =======================
 // LOAD PRODUCTS
@@ -63,21 +89,25 @@ document.getElementById("productForm").addEventListener("submit", async (e) => {
 
 async function loadProducts(){
 
-    const res = await fetch("/api/mobiles");
+    const res = await fetch("/api/products");
     const data = await res.json();
 
     const container = document.getElementById("adminProductContainer");
 
+    if(data.length === 0){
+        container.innerHTML = "<p>No products available</p>";
+        return;
+    }
+
     let html = "";
 
-    data.forEach((p, index) => {
-
+    data.forEach(p => {
         html += `
         <div class="admin-card">
-            <img src="${p.image}">
+            <img src="${p.image || '/images/default.png'}">
             <h3>${p.name}</h3>
             <p>${p.price}</p>
-            <button onclick="deleteProduct('mobiles', ${index})">Delete</button>
+            <button onclick="deleteProduct('${p._id}')">Delete</button>
         </div>
         `;
     });
@@ -85,61 +115,20 @@ async function loadProducts(){
     container.innerHTML = html;
 }
 
-
 // =======================
 // DELETE PRODUCT
 // =======================
 
-async function deleteProduct(category, index){
+async function deleteProduct(id){
 
-    const confirmDelete = confirm("Delete this product?");
-    if(!confirmDelete) return;
+    if(!confirm("Delete this product?")) return;
 
-    await fetch(`/api/${category}/${index}`, {
+    await fetch(`/api/products/${id}`, {
         method: "DELETE"
     });
 
-    alert("Deleted ✅");
-
     loadProducts();
 }
-
-
-// =======================
-// LOAD REPAIRS
-// =======================
-
-async function loadRepairs(){
-
-    const res = await fetch("/api/repairs");
-    const data = await res.json();
-
-    const container = document.getElementById("repairList");
-
-    // 🔥 Handle empty case
-    if(data.length === 0){
-        container.innerHTML = "<p>No repairs added yet</p>";
-        return;
-    }
-
-    let html = "";
-
-    data.forEach((r, index) => {
-    html += `
-        <div class="repair-card-admin">
-            <h4>${r.id}</h4>
-            <p><strong>Name:</strong> ${r.name}</p>
-            <p><strong>Device:</strong> ${r.device}</p>
-            <p><strong>Status:</strong> ${r.status}</p>
-
-            <button onclick="deleteRepair(${index})">Mark Delivered</button>
-        </div>
-    `;
-});
-
-    container.innerHTML = html;
-}
-
 
 // =======================
 // ADD REPAIR
@@ -150,7 +139,7 @@ document.getElementById("repairForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const repair = {
-        id: document.getElementById("repairId").value,
+        id: document.getElementById("repairId").value.trim().toUpperCase(),
         name: document.getElementById("customerName").value,
         device: document.getElementById("device").value,
         status: document.getElementById("status").value
@@ -164,13 +153,68 @@ document.getElementById("repairForm").addEventListener("submit", async (e) => {
 
     alert("Repair Added ✅");
 
-    // reset form
-    document.getElementById("repairForm").reset();
-
-    // 🔥 instant UI update
+    e.target.reset();
     loadRepairs();
 });
 
+// =======================
+// LOAD REPAIRS
+// =======================
+
+async function loadRepairs(){
+
+    const res = await fetch("/api/repairs");
+    const data = await res.json();
+
+    const container = document.getElementById("repairList");
+
+    if(data.length === 0){
+        container.innerHTML = "<p>No repairs available</p>";
+        return;
+    }
+
+    let html = "";
+
+    data.forEach(r => {
+        html += `
+        <div class="repair-card-admin">
+            <h4>${r.id}</h4>
+            <p>${r.name}</p>
+            <p>${r.device}</p>
+            <p>${r.status}</p>
+            <button onclick="deleteRepair('${r.id}')">Delivered</button>
+        </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// =======================
+// DELETE REPAIR
+// =======================
+
+async function deleteRepair(id){
+
+    await fetch(`/api/repair/${id}`, {
+        method: "DELETE"
+    });
+
+    loadRepairs();
+}
+
+// =======================
+// DASHBOARD
+// =======================
+
+async function loadDashboard(){
+
+    const products = await fetch("/api/products").then(res => res.json());
+    const repairs = await fetch("/api/repairs").then(res => res.json());
+
+    document.getElementById("totalProducts").innerText = products.length;
+    document.getElementById("totalRepairs").innerText = repairs.length;
+}
 
 // =======================
 // INIT
@@ -178,22 +222,4 @@ document.getElementById("repairForm").addEventListener("submit", async (e) => {
 
 loadProducts();
 loadRepairs();
-
-// =======================
-// DELETE REPAIR
-// =======================
-
-async function deleteRepair(index){
-
-    const confirmDelete = confirm("Mark this device as delivered?");
-
-    if(!confirmDelete) return;
-
-    await fetch(`/api/repairs/${index}`, {
-        method: "DELETE"
-    });
-
-    alert("Device Delivered ✅");
-
-    loadRepairs();
-}
+loadDashboard();

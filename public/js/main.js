@@ -1,7 +1,7 @@
 // =======================
 // SELECT ELEMENTS
 // =======================
-
+let allProducts = [];
 const mobilesBtn = document.getElementById("mobilesBtn");
 const electronicsBtn = document.getElementById("electronicsBtn");
 const toggleBg = document.getElementById("toggleBg");
@@ -29,7 +29,7 @@ function renderProducts(data) {
     <h3>${product.name}</h3>
 
     <ul>
-        ${product.features.map(f => `<li>${f}</li>`).join("")}
+        ${(product.features || []).map(f => `<li>${f}</li>`).join("")}
     </ul>
 
     <div class="bottom-row">
@@ -49,17 +49,24 @@ function renderProducts(data) {
 // LOAD DATA
 // =======================
 
-async function loadMobiles() {
-    const res = await fetch("/api/mobiles");
-    const data = await res.json();
-    renderProducts(data);
+async function loadProducts(category) {
+
+    const container = document.getElementById("productContainer");
+
+    // 🔥 First time fetch only
+    if(allProducts.length === 0){
+        container.innerHTML = "<p>Loading...</p>";
+
+        const res = await fetch("/api/products");
+        allProducts = await res.json();
+    }
+
+    const filtered = allProducts.filter(p => p.category === category);
+
+    renderProducts(filtered);
 }
 
-async function loadElectronics() {
-    const res = await fetch("/api/electronics");
-    const data = await res.json();
-    renderProducts(data);
-}
+
 
 
 // =======================
@@ -67,7 +74,7 @@ async function loadElectronics() {
 // =======================
 
 // default load
-loadMobiles();
+loadProducts("mobiles");
 
 mobilesBtn.addEventListener("click", () => {
 
@@ -76,7 +83,7 @@ mobilesBtn.addEventListener("click", () => {
 
     document.querySelector(".toggle").classList.remove("active-right");
 
-    loadMobiles();
+    loadProducts("mobiles");
 });
 
 electronicsBtn.addEventListener("click", () => {
@@ -86,9 +93,8 @@ electronicsBtn.addEventListener("click", () => {
 
     document.querySelector(".toggle").classList.add("active-right");
 
-    loadElectronics();
+    loadProducts("electronics");
 });
-
 // =======================
 // REPAIR TRACKING
 // =======================

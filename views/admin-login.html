@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Login</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+}
+
+/* glass card */
+.login-box{
+    background:rgba(255,255,255,0.1);
+    backdrop-filter:blur(15px);
+    border:1px solid rgba(255,255,255,0.2);
+    padding:35px;
+    width:320px;
+    border-radius:16px;
+    text-align:center;
+    box-shadow:0 20px 40px rgba(0,0,0,0.3);
+}
+
+/* heading */
+.login-box h2{
+    color:white;
+    margin-bottom:25px;
+    font-weight:600;
+}
+
+/* inputs */
+.login-box input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:8px;
+    border:none;
+    outline:none;
+    background:rgba(255,255,255,0.15);
+    color:white;
+}
+
+.login-box input::placeholder{
+    color:#cbd5f5;
+}
+
+/* button */
+.login-box button{
+    width:100%;
+    padding:12px;
+    margin-top:15px;
+    border:none;
+    border-radius:8px;
+    background:white;
+    color:#2563eb;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.login-box button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* error */
+#errorMsg{
+    color:#fca5a5;
+    margin-top:10px;
+    font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+    <h2>Admin Panel</h2>
+
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <p id="errorMsg"></p>
+</div>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", (e) => {
+
+    e.preventDefault();
+
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    if(username === "admin" && password === "1234"){
+        const token = btoa(username + ":" + password);
+        sessionStorage.setItem("auth", token);
+        window.location.href = "/admin";
+    } else {
+        document.getElementById("errorMsg").innerText = "Invalid credentials";
+    }
+});
+</script>
+
+</body>
+</html>

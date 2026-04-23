@@ -1,25 +1,45 @@
-const express = require("express");
-const path = require("path");
+const multer = require("multer");
+const sharp = require("sharp");
 const fs = require("fs");
+
+
 require("dotenv").config();
 
-const app = express();
-const PORT = process.env.PORT || 4000;
-
+const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
 
-// =======================
-// MONGODB CONNECTION
-// =======================
-mongoose.connect(process.env.MONGO)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+
+const app = express();
+
+const PORT = process.env.PORT || 5000;
+const MONGO_URL = process.env.MONGO_URL;
+
+
+
+
+
 
 // =======================
 // MIDDLEWARE
 // =======================
 app.use(express.json());
 app.use(express.static("public"));
+app.use("/uploads", express.static("public/uploads"));
+
+// =======================
+// MONGODB CONNECTION
+// =======================
+mongoose.connect(MONGO_URL)
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
+
+//=======Schema===========
+const Product = require("./models/Product");
+const Repair = require("./models/Repair");
+
+
+
 
 // =======================
 // ROUTES (PAGES)
@@ -29,7 +49,7 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "views", "index.html"));
 });
 
-app.get("/admin", (req, res) => {
+app.get("/admin",  (req, res) => {
     res.sendFile(path.join(__dirname, "views", "admin.html"));
 });
 
@@ -38,156 +58,141 @@ app.get("/admin", (req, res) => {
 // API ROUTES
 // =======================
 
+//  Products : Getting and Adding 
 
-// 🔹 GET MOBILES
-app.get("/api/mobiles", (req, res) => {
 
-    const filePath = path.join(__dirname, "data", "mobiles.json");
+app.get("/api/products", async (req, res) => {
+    try {
+       const products = await Product.find().lean();
+        res.json(products);
+    } catch (err) {
+        res.status(500).json({ error: "Server Error" });
+    }
+});
 
-    const data = fs.readFileSync(filePath);
-    res.json(JSON.parse(data));
+app.post("/api/products", async (req, res) => {
+
+    const product = new Product(req.body);
+    await product.save();
+
+    res.send("Product Added");
 });
 
 
-// 🔹 ADD MOBILE
-app.post("/api/mobiles", (req, res) => {
 
-    const filePath = path.join(__dirname, "data", "mobiles.json");
+//  DELETE PRODUCT
+app.delete("/api/products/:id", async (req, res) => {
 
-    const newProduct = req.body;
+    await Product.findByIdAndDelete(req.params.id);
 
-    const data = fs.readFileSync(filePath);
-    const mobiles = JSON.parse(data);
-
-    mobiles.push(newProduct);
-
-    fs.writeFileSync(filePath, JSON.stringify(mobiles, null, 2));
-
-    res.send("Mobile Added");
+    res.send("Deleted");
 });
-
-
-// 🔹 GET ELECTRONICS
-app.get("/api/electronics", (req, res) => {
-
-    const filePath = path.join(__dirname, "data", "electronics.json");
-
-    const data = fs.readFileSync(filePath);
-    res.json(JSON.parse(data));
-});
-
-
-// 🔹 ADD ELECTRONICS
-app.post("/api/electronics", (req, res) => {
-
-    const filePath = path.join(__dirname, "data", "electronics.json");
-
-    const newProduct = req.body;
-
-    const data = fs.readFileSync(filePath);
-    const electronics = JSON.parse(data);
-
-    electronics.push(newProduct);
-
-    fs.writeFileSync(filePath, JSON.stringify(electronics, null, 2));
-
-    res.send("Electronics Added");
-});
-
-
-// 🔹 DELETE PRODUCT
-app.delete("/api/:category/:index", (req, res) => {
-
-    const { category, index } = req.params;
-
-    const filePath = path.join(__dirname, "data", `${category}.json`);
-
-    const data = fs.readFileSync(filePath);
-    const items = JSON.parse(data);
-
-    items.splice(index, 1);
-
-    fs.writeFileSync(filePath, JSON.stringify(items, null, 2));
-
-    res.send("Deleted Successfully");
-});
-
-
 // =======================
-// 🔥 REPAIR TRACKING SYSTEM
+// REPAIR TRACKING SYSTEM
 // =======================
 
 
-// 🔹 ADD REPAIR
-app.post("/api/repairs", (req, res) => {
+//adding repair 
+app.post("/api/repairs", async (req, res) => {
 
-    const filePath = path.join(__dirname, "data", "repairs.json");
+    const repair = new Repair(req.body);
 
-    const newRepair = req.body;
-
-    const data = fs.readFileSync(filePath);
-    const repairs = JSON.parse(data);
-
-    repairs.push(newRepair);
-
-    fs.writeFileSync(filePath, JSON.stringify(repairs, null, 2));
+    await repair.save();
 
     res.send("Repair Added");
 });
 
+//getting repair
+app.get("/api/repairs", async (req, res) => {
 
-// 🔹 GET ALL REPAIRS (FOR ADMIN)
-app.get("/api/repairs", (req, res) => {
+    const repairs = await Repair.find();
 
-    const filePath = path.join(__dirname, "data", "repairs.json");
-
-    const data = fs.readFileSync(filePath);
-    res.json(JSON.parse(data));
+    res.json(repairs);
 });
 
+//tracking
+app.get("/api/repair/:id", async (req, res) => {
 
-// 🔹 GET REPAIR BY ID (FOR USER)
-app.get("/api/repair/:id", (req, res) => {
+    const repair = await Repair.findOne({
+        id: req.params.id.toUpperCase()
+    });
 
-    const filePath = path.join(__dirname, "data", "repairs.json");
-
-    const repairId = req.params.id.trim().toUpperCase();
-
-    const data = fs.readFileSync(filePath);
-    const repairs = JSON.parse(data);
-
-    const found = repairs.find(r => 
-        r.id.trim().toUpperCase() === repairId
-    );
-
-    if(found){
-        res.json(found);
+    if(repair){
+        res.json(repair);
     } else {
-        res.status(404).json({ message: "Not Found" });
+        res.status(404).send("Not Found");
     }
 });
 
-// 🔹 DELETE REPAIR
-app.delete("/api/repairs/:index", (req, res) => {
 
-    const filePath = path.join(__dirname, "data", "repairs.json");
+//deleting repair
+app.delete("/api/repair/:id", async (req, res) => {
 
-    const index = req.params.index;
+    await Repair.findOneAndDelete({
+        id: req.params.id
+    });
 
-    const data = fs.readFileSync(filePath);
-    const repairs = JSON.parse(data);
+    res.send("Deleted");
+});
 
-    repairs.splice(index, 1); // remove repair
+//multer config
 
-    fs.writeFileSync(filePath, JSON.stringify(repairs, null, 2));
 
-    res.send("Repair Deleted");
+const storage = multer.memoryStorage(); // store in RAM
+
+const upload = multer({
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB max
+});
+
+//api route for multer
+
+app.post("/api/upload", upload.single("image"), async (req, res) => {
+    try {
+        const filename = Date.now() + ".jpg";
+
+        await sharp(req.file.buffer)
+            .resize(400, 400) // 🔥 AUTO RESIZE
+            .jpeg({ quality: 80 })
+            .toFile(`public/uploads/${filename}`);
+
+        res.json({ imageUrl: `/uploads/${filename}` });
+
+    } catch (err) {
+        res.status(500).json({ error: "Image upload failed" });
+    }
 });
 
 
-// =======================
-// START SERVER
-// =======================
+//auth 
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "1234";
+
+function checkAuth(req, res, next) {
+    const auth = req.headers.authorization;
+
+    if (!auth) {
+        res.setHeader("WWW-Authenticate", "Basic");
+        return res.status(401).send("Authentication required");
+    }
+
+    const [user, pass] = Buffer.from(auth.split(" ")[1], "base64")
+        .toString()
+        .split(":");
+
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+        next();
+    } else {
+        res.setHeader("WWW-Authenticate", "Basic");
+        res.status(401).send("Invalid credentials");
+    }
+}
+
+//admin login
+
+app.get("/admin-login", (req, res) => {
+    res.sendFile(path.join(__dirname, "views", "admin-login.html"));
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
